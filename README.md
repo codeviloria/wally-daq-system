@@ -8,11 +8,11 @@
 Sistema híbrido de adquisición de datos para sensores Vernier que permite **cambio dinámico de sensores sin pérdida de datos**. Utiliza ESP32 como servidor de sensores y Python/Tkinter para interfaz profesional.
 
 ## 👨‍💻 Consultoría y Desarrollo
-**Desarrollado por:** [Ingeniero Gino Viloria](mailto:gino.viloria@consultoria.com)  
+**Desarrollado por:** [Ingeniero Gino Viloria](mailto:codevilor.ia@gmail.com)  
 **Especialización:** Sistemas IoT, Adquisición de Datos, Python & MicroPython  
 **Consultoría disponible:** Implementación, customización y soporte técnico
 
-📧 **Contacto profesional:** gino.viloria@consultoria.com  
+📧 **Contacto profesional:** codevilor.ia@gmail.com  
 🔗 **LinkedIn:** [linkedin.com/in/gino-viloria](https://linkedin.com/in/gino-viloria)  
 💼 **Servicios:** Desarrollo de prototipos, integración de sensores, sistemas DAQ personalizados
 
