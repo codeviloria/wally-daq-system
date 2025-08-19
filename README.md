@@ -1,4 +1,3 @@
-```markdown
 # 🔬 Wally - Sistema de Adquisición de Datos ESP32 + Python
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
