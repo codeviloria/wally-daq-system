@@ -103,34 +103,62 @@ ESP32 (MicroPython) ←→ HTTP/JSON ←→ Python Controller ←→ Tkinter UI
 - ✅ **VernierLib equivalence** - autoID simulation
 - ✅ **Formato de salida** compatible
 
-## 📁 Estructura del Repositorio
+## 📁 **Estructura del Repositorio**
 
 ```
 wally-daq-system/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── LICENSE
-├── esp32/                           # ← Código MicroPython
-│   ├── main.py                      # → Main migrado de Arduino setup()/loop()
-│   ├── config.py                    # → Configuración WiFi + pines
-│   ├── sensor_server.py             # → HTTP server + sensores Vernier
-│   └── boot.py                      # → Boot sequence ESP32
-├── pc_controller/                   # ← Aplicación Python/Tkinter
-│   ├── main.py                      # → Controller principal
-│   ├── config.py                    # → Configuración sistema
-│   ├── ui_dashboard.py              # → Dashboard + controles Vernier
-│   ├── data_manager.py              # → Gestión datos/CSV
-│   ├── esp32_client.py              # → Cliente HTTP + comandos Arduino
-│   └── utils.py                     # → Utilidades varias
-├── scripts/                         # ← Scripts instalación
-│   ├── setup_environment.sh/.bat    # → Setup multiplataforma
-│   └── install_esp32.sh/.bat        # → Flash ESP32 automático
-├── docs/
-│   └── installation.md              # → Guía instalación completa
-└── data/
-    └── .gitkeep                     # → Directorio datos CSV
+├── LICENSE                                    # → Licencia del proyecto (MIT)
+├── README.md                                  # → Documentación principal del sistema
+├── requirements.txt                           # → Dependencias Python para PC
+├── data/                                      # → Directorio para almacenar datos CSV exportados
+├── docs/                                      # ← Documentación técnica y guías
+│   ├── installation.md                        # → Guía detallada de instalación paso a paso
+│   └── 🔬 Wally DAQ System - Guía Setup Estudiantes.md  # → Guía específica para estudiantes
+├── esp32/                                     # ← Código MicroPython para ESP32
+│   ├── boot.py                                # → Secuencia de arranque automático del ESP32
+│   ├── config.py                              # → Configuración WiFi, pines y calibraciones
+│   ├── main.py                                # → Programa principal (equivale a setup() y loop() de Arduino)
+│   ├── sensor_server.py                       # → Servidor HTTP + manejo de sensores Vernier
+│   └── vernier_sensors_migrated.py           # → Migración específica de sensores Vernier desde Arduino
+├── pc_controller/                             # ← Aplicación cliente Python/Tkinter
+│   ├── config.py                              # → Configuración del cliente PC (IP, puertos, intervalos)
+│   ├── data_manager.py                        # → Gestión de datos, buffer circular y export CSV
+│   ├── esp32_client.py                        # → Cliente HTTP para comunicación con ESP32
+│   ├── esp32_client_backup.py                 # → Respaldo de versión anterior del cliente
+│   ├── main.py                                # → Controlador principal y punto de entrada
+│   ├── main_backup.py                         # → Respaldo de versión anterior del main
+│   ├── ui_dashboard.py                        # → Interfaz gráfica con controles y gráficos tiempo real
+│   ├── ui_dashboard_backup.py                 # → Respaldo de versión anterior de la interfaz
+│   └── utils.py                               # → Funciones utilitarias y helpers
+└── scripts/                                   # ← Scripts de instalación y configuración
+    ├── install_esp32.bat                      # → Script Windows para flashear ESP32 automáticamente
+    ├── install_esp32.sh                       # → Script Linux/macOS para flashear ESP32 automáticamente
+    ├── setup_environment.bat                  # → Setup completo del entorno en Windows
+    └── setup_environment.sh                   # → Setup completo del entorno en Linux/macOS
 ```
+
+### 📋 **Descripción de Archivos Clave**
+
+| Archivo | Función Principal | Tecnología |
+|---------|------------------|------------|
+| `esp32/main.py` | Punto de entrada ESP32, inicia servidor HTTP | MicroPython |
+| `esp32/sensor_server.py` | Manejo de sensores + API REST compatible Arduino | MicroPython |
+| `esp32/config.py` | Configuración WiFi y mapeo de pines ESP32 | MicroPython |
+| `pc_controller/main.py` | Aplicación cliente principal con GUI | Python + Tkinter |
+| `pc_controller/ui_dashboard.py` | Interfaz gráfica y visualización tiempo real | Tkinter + matplotlib |
+| `pc_controller/data_manager.py` | Buffer de datos y exportación CSV | Python + pandas |
+| `esp32/vernier_sensors_migrated.py` | Migración específica de funciones Vernier | MicroPython |
+
+### 🔧 **Archivos de Configuración**
+
+- **`esp32/config.py`**: WiFi, pines GPIO, calibraciones Vernier
+- **`pc_controller/config.py`**: IP ESP32, intervalos, configuración UI
+- **`requirements.txt`**: Dependencias Python (requests, matplotlib, pandas, etc.)
+
+### 📜 **Scripts de Automatización**
+
+- **`scripts/setup_environment.*`**: Instalación completa del entorno
+- **`scripts/install_esp32.*`**: Flash automático del ESP32 con MicroPython
 
 ## 🚀 Quick Start
 
