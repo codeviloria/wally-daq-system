@@ -37,7 +37,7 @@ ESP32 (MicroPython) ←→ Python Controller ←→ Tkinter UI
 
 ### 1. Clonar repositorio
 ```bash
-git clone https://github.com/tu-usuario/wally-daq-system.git
+git clone https://github.com/codeviloria/wally-daq-system.git
 cd wally-daq-system
 ```
 
