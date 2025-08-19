@@ -33,6 +33,39 @@ ESP32 (MicroPython) ←→ Python Controller ←→ Tkinter UI
 - ✅ **Buffer circular** para gestión de memoria
 - ✅ **Threading** para UI responsive
 
+# 🔬 Wally DAQ System - Todos los Archivos
+
+## 📁 Estructura del Repositorio
+```
+wally-daq-system/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+├── esp32/
+│   ├── main.py
+│   ├── config.py
+│   ├── sensor_server.py
+│   └── boot.py
+├── pc_controller/
+│   ├── main.py
+│   ├── config.py
+│   ├── ui_dashboard.py
+│   ├── data_manager.py
+│   ├── esp32_client.py
+│   └── utils.py
+├── scripts/
+│   ├── setup_environment.sh    # Linux/macOS
+│   ├── setup_environment.bat   # Windows
+│   ├── install_esp32.sh        # Linux/macOS
+│   └── install_esp32.bat       # Windows
+├── docs/
+│   └── installation.md
+└── data/
+    └── .gitkeep
+```
+
+
 ## 🚀 Quick Start
 
 ### 1. Clonar repositorio
