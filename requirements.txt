@@ -1,0 +1,10 @@
+matplotlib==3.7.1
+numpy==1.24.3
+pandas==2.0.2
+requests==2.31.0
+pyserial==3.5
+ampy==1.1.0
+esptool==4.6.2
+
+# Dependencias adicionales para Windows
+adafruit-ampy==1.1.0
