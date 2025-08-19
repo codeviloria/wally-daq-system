@@ -8,6 +8,7 @@ import socket
 import ujson
 import time
 from sensor_server import SensorServer
+from vernier_sensors_migrated import VernierSensorManager
 
 def main():
     print("🔬 Iniciando Wally ESP32 Sensor Server...")

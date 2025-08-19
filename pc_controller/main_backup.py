@@ -144,20 +144,11 @@ class WallyController:
                 self.stop_event.wait(1)  # Esperar 1 segundo antes de reintentar
     
     def update_ui_callback(self, data):
-        """Callback para actualizar UI (ACTUALIZAR)"""
+        """Callback para actualizar UI desde el thread principal"""
         self.dashboard.update_sensors(data.get('readings', {}))
         self.dashboard.update_chart(data)
         self.dashboard.update_stats(self.data_manager.get_stats())
-        
-        # NUEVO: Actualizar status Vernier periódicamente
-        if hasattr(self, 'last_vernier_update'):
-            if time.time() - self.last_vernier_update > 5:  # Cada 5 segundos
-                self.update_vernier_status()
-                self.last_vernier_update = time.time()
-        else:
-            self.last_vernier_update = time.time()
-            self.update_vernier_status()
-
+    
     def handle_connection_lost(self):
         """Manejar pérdida de conexión con ESP32"""
         self.stop_acquisition()
@@ -234,96 +225,7 @@ class WallyController:
         except Exception as e:
             print(f"❌ Error fatal: {e}")
             messagebox.showerror("Error Fatal", f"Error inesperado: {str(e)}")
-####WallyController
-# AGREGAR AL FINAL de la clase WallyController en main.py
 
-    # ========== NUEVOS MÉTODOS VERNIER ==========
-    
-    def change_to_temperature(self):
-        """Cambiar a sensor temperatura"""
-        try:
-            result = self.esp32_client.change_to_temperature()
-            if result:
-                print("🌡️ Cambiado a sensor temperatura")
-                messagebox.showinfo("Sensor Cambiado", "Ahora leyendo sensor de temperatura")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudo cambiar a sensor temperatura")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error cambiando sensor: {str(e)}")
-    
-    def change_to_force(self):
-        """Cambiar a sensor fuerza"""
-        try:
-            result = self.esp32_client.change_to_force()
-            if result:
-                print("⚡ Cambiado a sensor fuerza")
-                messagebox.showinfo("Sensor Cambiado", "Ahora leyendo sensor de fuerza")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudo cambiar a sensor fuerza")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error cambiando sensor: {str(e)}")
-    
-    def change_to_photogate(self):
-        """Cambiar a fotopuerta"""
-        try:
-            result = self.esp32_client.change_to_photogate()
-            if result:
-                print("📷 Cambiado a fotopuerta")
-                messagebox.showinfo("Sensor Cambiado", "Ahora leyendo fotopuerta")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudo cambiar a fotopuerta")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error cambiando sensor: {str(e)}")
-    
-    def change_to_motion(self):
-        """Cambiar a sensor movimiento"""
-        try:
-            result = self.esp32_client.change_to_motion()
-            if result:
-                print("📐 Cambiado a sensor movimiento")
-                messagebox.showinfo("Sensor Cambiado", "Ahora leyendo sensor de movimiento")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudo cambiar a sensor movimiento")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error cambiando sensor: {str(e)}")
-    
-    def stop_vernier_readings(self):
-        """Pausar lecturas Vernier"""
-        try:
-            result = self.esp32_client.stop_readings()
-            if result:
-                print("⏸️ Lecturas Vernier pausadas")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudieron pausar las lecturas")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error pausando lecturas: {str(e)}")
-    
-    def continue_vernier_readings(self):
-        """Continuar lecturas Vernier"""
-        try:
-            result = self.esp32_client.continue_readings()
-            if result:
-                print("▶️ Lecturas Vernier continuadas")
-                self.update_vernier_status()
-            else:
-                messagebox.showerror("Error", "No se pudieron continuar las lecturas")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error continuando lecturas: {str(e)}")
-    
-    def update_vernier_status(self):
-        """Actualizar status Vernier en UI"""
-        try:
-            vernier_status = self.esp32_client.get_vernier_status()
-            if vernier_status:
-                self.dashboard.update_vernier_status(vernier_status)
-        except Exception as e:
-            print(f"Error actualizando status Vernier: {e}")
-            
 def main():
     """Función principal"""
     try:
@@ -341,4 +243,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
