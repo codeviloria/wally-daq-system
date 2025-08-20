@@ -3,10 +3,41 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![MicroPython](https://img.shields.io/badge/MicroPython-ESP32-green.svg)](https://micropython.org)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Linux%20%7C%20macOS-brightgreen.svg)](https://github.com)
-[![Arduino](https://img.shields.io/badge/Arduino-Compatible-orange.svg)](https://arduino.cc)
+[![Simulation](https://img.shields.io/badge/Simulation-Wokwi-orange.svg)](https://wokwi.com)
+[![Arduino](https://img.shields.io/badge/Arduino-Compatible-red.svg)](https://arduino.cc)
 
 Sistema híbrido de adquisición de datos para sensores Vernier que permite **cambio dinámico de sensores sin pérdida de datos**. Migrado desde Arduino a ESP32 con MicroPython manteniendo 100% compatibilidad de comandos.
+
+## 🎮 **¡NUEVO! Simulación Completa Sin Hardware**
+
+**🚀 Ahora puedes probar TODO el sistema sin ESP32 ni sensores físicos:**
+
+| **Simulador** | **Tiempo Setup** | **Características** | **Enlace** |
+|---------------|------------------|---------------------|------------|
+| **🌟 Wokwi (Recomendado)** | 5 min | ESP32 + MicroPython nativo, WiFi, HTTP | [🎮 Simular Ahora](https://wokwi.com/projects/new/micropython-esp32) |
+| **🛠️ Python Mock** | 2 min | Emulador local, desarrollo rápido | [📝 Ver Código](simulation/mock_server/) |
+| **🐳 Docker** | 3 min | Entorno aislado, CI/CD ready | [🐳 Ver Setup](docs/simulation-guide.md#docker-environment) |
+
+### **⚡ Quick Start Simulación:**
+```bash
+# Opción 1: Wokwi (Online, sin instalación)
+1. Ir a: https://wokwi.com/projects/new/micropython-esp32
+2. Copiar código de: docs/simulation-guide.md
+3. ¡Listo! Sistema funcionando en 5 minutos
+
+# Opción 2: Python Mock (Local)
+git clone este-repo
+python simulation/mock_server/mock_esp32_server.py
+cd pc_controller && python main.py
+```
+
+### **📋 Documentación de Simulación:**
+- 📖 [**Guía Completa de Simulación**](docs/simulation-guide.md) - Setup paso a paso
+- 🧪 [**Testing y Validación**](docs/simulation-guide.md#testing-y-validación) - Scripts automáticos  
+- 🔧 [**Troubleshooting**](docs/simulation-guide.md#troubleshooting) - Solución problemas
+- 🎯 [**Casos de Uso**](docs/simulation-guide.md#casos-de-uso) - Educación, desarrollo, demos
+
+---
 
 ## 👨‍💻 Consultoría y Desarrollo
 **Desarrollado por:** [Ingeniero Gino Viloria](mailto:codevilor.ia@gmail.com)  
@@ -22,77 +53,34 @@ Sistema híbrido de adquisición de datos para sensores Vernier que permite **ca
 ### **Arquitectura Original vs Nueva**
 
 ```
-ANTES (Arduino):                    DESPUÉS (ESP32 + Python):
-┌─────────────────┐                ┌─────────────────┐    ┌─────────────────┐
-│     Arduino     │ Serial         │     ESP32       │ WiFi │   PC Python     │
-│   + VernierLib  │◄──────────────►│  MicroPython    │◄────►│  Tkinter UI     │
-│   + 4 Sensores  │                │  + HTTP Server  │      │  + Dashboard    │
-└─────────────────┘                └─────────────────┘      └─────────────────┘
+ANTES (Arduino):                    DESPUÉS (ESP32 + Python + Simulación):
+┌─────────────────┐                ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│     Arduino     │ Serial         │     ESP32       │ WiFi │   PC Python     │    │  🎮 Simulación   │
+│   + VernierLib  │◄──────────────►│  MicroPython    │◄────►│  Tkinter UI     │    │    Wokwi/Mock   │
+│   + 4 Sensores  │                │  + HTTP Server  │      │  + Dashboard    │    │   Sin Hardware  │
+└─────────────────┘                └─────────────────┘      └─────────────────┘    └─────────────────┘
 ```
 
 ### **🔌 Mapeo de Puertos Arduino → ESP32**
 
-| **Sensor** | **Arduino Pin** | **ESP32 GPIO** | **Función** | **Tipo** |
-|------------|-----------------|----------------|-------------|----------|
-| 🌡️ **Temperatura** | A0 (Analog) | **GPIO 34** | ADC1_CH6 | Entrada Analógica |
-| ⚡ **Fuerza** | A1 (Analog) | **GPIO 35** | ADC1_CH7 | Entrada Analógica |
-| 📷 **Fotopuerta** | D2 (Digital) | **GPIO 4** | Input/Pull-up | Entrada Digital |
-| 📐 **Movimiento Echo** | D2 (Digital) | **GPIO 18** | Input | Entrada Digital |
-| 🔊 **Movimiento Trigger** | D3 (Digital) | **GPIO 5** | Output | Salida Digital |
-| 💡 **LED Status** | D13 (Digital) | **GPIO 2** | Output | LED Integrado |
-
-### **⚡ Comandos Arduino Migrados**
-
-| **Comando** | **Función Original** | **Nueva Implementación** | **URL HTTP** |
-|-------------|---------------------|--------------------------|--------------|
-| `t` | Cambiar a Temperatura | ✅ HTTP GET | `/vernier/command/t` |
-| `f` | Cambiar a Fuerza | ✅ HTTP GET | `/vernier/command/f` |
-| `p` | Cambiar a Fotopuerta | ✅ HTTP GET | `/vernier/command/p` |
-| `m` | Cambiar a Movimiento | ✅ HTTP GET | `/vernier/command/m` |
-| `d` | Detener lecturas | ✅ HTTP GET | `/vernier/command/d` |
-| `c` | Continuar lecturas | ✅ HTTP GET | `/vernier/command/c` |
-
-### **🔬 Sensores Vernier Soportados**
-
-```cpp
-// Código Arduino Original:
-#define SENSOR_TEMPERATURA 1    // TMP36 en A0
-#define SENSOR_FUERZA 2        // Dual-Range Force + VernierLib 
-#define SENSOR_FOTOPUERTA 3    // Photogate en D2
-#define SENSOR_MOVIMIENTO 4    // Ultrasonico HC-SR04 D2/D3
-```
-
-```python
-# Migración ESP32 MicroPython:
-SENSOR_TEMPERATURA = 1    # ADC GPIO34 - TMP36 compatible
-SENSOR_FUERZA = 2        # ADC GPIO35 - Calibración Vernier
-SENSOR_FOTOPUERTA = 3    # GPIO4 - Detección estado + LED
-SENSOR_MOVIMIENTO = 4    # GPIO5/18 - Ultrasonico timing
-```
-
-## 🏗️ Arquitectura del Sistema
-
-```
-ESP32 (MicroPython) ←→ HTTP/JSON ←→ Python Controller ←→ Tkinter UI
-     │                                    │                    │
-┌────▼────────────────┐          ┌────────▼────────┐    ┌─────▼─────────────┐
-│ • Sensores Vernier  │          │ • Data Manager  │    │ • Dashboard       │
-│ • Servidor HTTP     │          │ • Buffer Logic  │    │ • Real-time Plots │
-│ • Comandos Arduino  │          │ • CSV Export    │    │ • Sensor Control  │
-│ • Auto-detección    │          │ • Threading     │    │ • Status Monitor  │
-└─────────────────────┘          └─────────────────┘    └───────────────────┘
-```
+| **Sensor** | **Arduino Pin** | **ESP32 GPIO** | **Simulación** | **Función** |
+|------------|-----------------|----------------|----------------|-------------|
+| 🌡️ **Temperatura** | A0 (Analog) | **GPIO 34** | Potenciómetro | ADC1_CH6 |
+| ⚡ **Fuerza** | A1 (Analog) | **GPIO 35** | Potenciómetro | ADC1_CH7 |
+| 📷 **Fotopuerta** | D2 (Digital) | **GPIO 4** | Botón azul | Input/Pull-up |
+| 📐 **Movimiento** | D3 (Digital) | **GPIO 5/18** | Automático | Trigger/Echo |
+| 💡 **LED Status** | D13 (Digital) | **GPIO 2** | LED virtual | LED Integrado |
 
 ## ⚡ Características
 
 ### **🆕 Nuevas Funcionalidades (vs Arduino):**
+- ✅ **🎮 Simulación completa** - Probar sin hardware con Wokwi/Mock
 - ✅ **WiFi Integration** - Control remoto via HTTP
 - ✅ **Interfaz gráfica profesional** con Tkinter
 - ✅ **Gráficos en tiempo real** con matplotlib
 - ✅ **Export CSV automático** con timestamps
 - ✅ **Buffer circular inteligente** - sin pérdida de memoria
 - ✅ **Threading** para UI responsive
-- ✅ **Reconexión automática** WiFi/HTTP
 - ✅ **Hot-swapping** de sensores sin reinicio
 
 ### **✅ Funcionalidad Arduino Preservada:**
@@ -103,214 +91,98 @@ ESP32 (MicroPython) ←→ HTTP/JSON ←→ Python Controller ←→ Tkinter UI
 - ✅ **VernierLib equivalence** - autoID simulation
 - ✅ **Formato de salida** compatible
 
+## 🚀 Quick Start
+
+### **🎯 Elige tu Opción:**
+
+#### **🎮 Opción 1: Simulación (SIN HARDWARE) - 5 minutos**
+**✅ Ideal para:** Aprendizaje, demos, desarrollo inicial
+```bash
+# Setup más rápido - Solo navegador
+1. Ir a: https://wokwi.com/projects/new/micropython-esp32
+2. Seguir: docs/simulation-guide.md
+3. ¡Sistema completo funcionando!
+```
+
+#### **🔧 Opción 2: Hardware Real - 15 minutos**
+**✅ Ideal para:** Implementación final, producción
+```bash
+# Setup tradicional con ESP32 físico
+1. git clone https://github.com/codeviloria/wally-daq-system.git
+2. scripts/setup_environment.sh  # o .bat en Windows
+3. Configurar WiFi en esp32/config.py
+4. scripts/install_esp32.sh /dev/ttyUSB0
+5. cd pc_controller && python main.py
+```
+
+#### **🛠️ Opción 3: Desarrollo Híbrido - 10 minutos**
+**✅ Ideal para:** Desarrollo profesional, testing
+```bash
+# Simulación + desarrollo
+git clone https://github.com/codeviloria/wally-daq-system.git
+python simulation/mock_server/mock_esp32_server.py &
+cd pc_controller && python main.py
+```
+
 ## 📁 **Estructura del Repositorio**
 
 ```
 wally-daq-system/
-├── LICENSE                                    # → Licencia del proyecto (MIT)
-├── README.md                                  # → Documentación principal del sistema
-├── requirements.txt                           # → Dependencias Python para PC
-├── data/                                      # → Directorio para almacenar datos CSV exportados
-├── docs/                                      # ← Documentación técnica y guías
-│   ├── installation.md                        # → Guía detallada de instalación paso a paso
-│   └── 🔬 Wally DAQ System - Guía Setup Estudiantes.md  # → Guía específica para estudiantes
-├── esp32/                                     # ← Código MicroPython para ESP32
-│   ├── boot.py                                # → Secuencia de arranque automático del ESP32
-│   ├── config.py                              # → Configuración WiFi, pines y calibraciones
-│   ├── main.py                                # → Programa principal (equivale a setup() y loop() de Arduino)
-│   ├── sensor_server.py                       # → Servidor HTTP + manejo de sensores Vernier
-│   └── vernier_sensors_migrated.py           # → Migración específica de sensores Vernier desde Arduino
-├── pc_controller/                             # ← Aplicación cliente Python/Tkinter
-│   ├── config.py                              # → Configuración del cliente PC (IP, puertos, intervalos)
-│   ├── data_manager.py                        # → Gestión de datos, buffer circular y export CSV
-│   ├── esp32_client.py                        # → Cliente HTTP para comunicación con ESP32
-│   ├── esp32_client_backup.py                 # → Respaldo de versión anterior del cliente
-│   ├── main.py                                # → Controlador principal y punto de entrada
-│   ├── main_backup.py                         # → Respaldo de versión anterior del main
-│   ├── ui_dashboard.py                        # → Interfaz gráfica con controles y gráficos tiempo real
-│   ├── ui_dashboard_backup.py                 # → Respaldo de versión anterior de la interfaz
-│   └── utils.py                               # → Funciones utilitarias y helpers
-└── scripts/                                   # ← Scripts de instalación y configuración
-    ├── install_esp32.bat                      # → Script Windows para flashear ESP32 automáticamente
-    ├── install_esp32.sh                       # → Script Linux/macOS para flashear ESP32 automáticamente
-    ├── setup_environment.bat                  # → Setup completo del entorno en Windows
-    └── setup_environment.sh                   # → Setup completo del entorno en Linux/macOS
+├── 📋 README.md                                  # → Este archivo - Documentación principal
+├── 📄 requirements.txt                           # → Dependencias Python para PC
+├── 🎮 **simulation/**                            # → **NUEVO: Simulación sin hardware**
+│   ├── 🌟 **wokwi/**                            # → Código para simulador Wokwi
+│   │   ├── main.py                              # → ESP32 MicroPython para Wokwi
+│   │   └── diagram.json                         # → Configuración componentes virtuales
+│   ├── 🛠️ **mock_server/**                     # → Emulador Python local
+│   │   └── mock_esp32_server.py                 # → Servidor mock completo
+│   └── 🧪 **testing/**                         # → Scripts de testing automático
+│       ├── test_simulation.py                   # → Suite de validación
+│       ├── monitor_simulation.py                # → Monitor tiempo real
+│       └── diagnose_system.py                   # → Diagnóstico automático
+├── 📚 **docs/**                                 # → Documentación técnica y guías
+│   ├── 📖 **simulation-guide.md**               # → **NUEVO: Guía completa simulación**
+│   ├── installation.md                          # → Guía instalación hardware real
+│   └── student-setup-guide.md                   # → Guía específica para estudiantes
+├── 🔧 **esp32/**                                # → Código MicroPython para ESP32 real
+│   ├── main.py                                  # → Programa principal ESP32
+│   ├── config.py                                # → Configuración WiFi, pines, calibraciones
+│   ├── sensor_server.py                         # → Servidor HTTP + sensores Vernier
+│   └── boot.py                                  # → Secuencia de arranque automático
+├── 🖥️ **pc_controller/**                        # → Aplicación cliente Python/Tkinter
+│   ├── main.py                                  # → Controlador principal y punto de entrada
+│   ├── config.py                                # → Configuración cliente PC (IP, puertos)
+│   ├── ui_dashboard.py                          # → Interfaz gráfica con gráficos tiempo real
+│   ├── data_manager.py                          # → Gestión datos, buffer circular, export CSV
+│   └── esp32_client.py                          # → Cliente HTTP para comunicación ESP32
+└── 🔨 **scripts/**                              # → Scripts de instalación y configuración
+    ├── setup_environment.sh/.bat                # → Setup completo del entorno
+    └── install_esp32.sh/.bat                    # → Flash ESP32 automáticamente
 ```
 
-### 📋 **Descripción de Archivos Clave**
+## 🧪 Testing y Validación
 
-| Archivo | Función Principal | Tecnología |
-|---------|------------------|------------|
-| `esp32/main.py` | Punto de entrada ESP32, inicia servidor HTTP | MicroPython |
-| `esp32/sensor_server.py` | Manejo de sensores + API REST compatible Arduino | MicroPython |
-| `esp32/config.py` | Configuración WiFi y mapeo de pines ESP32 | MicroPython |
-| `pc_controller/main.py` | Aplicación cliente principal con GUI | Python + Tkinter |
-| `pc_controller/ui_dashboard.py` | Interfaz gráfica y visualización tiempo real | Tkinter + matplotlib |
-| `pc_controller/data_manager.py` | Buffer de datos y exportación CSV | Python + pandas |
-| `esp32/vernier_sensors_migrated.py` | Migración específica de funciones Vernier | MicroPython |
-
-### 🔧 **Archivos de Configuración**
-
-- **`esp32/config.py`**: WiFi, pines GPIO, calibraciones Vernier
-- **`pc_controller/config.py`**: IP ESP32, intervalos, configuración UI
-- **`requirements.txt`**: Dependencias Python (requests, matplotlib, pandas, etc.)
-
-### 📜 **Scripts de Automatización**
-
-- **`scripts/setup_environment.*`**: Instalación completa del entorno
-- **`scripts/install_esp32.*`**: Flash automático del ESP32 con MicroPython
-
-## 🚀 Quick Start
-
-### 1. Clonar repositorio
+### **🎯 Testing Automático**
 ```bash
-git clone https://github.com/codeviloria/wally-daq-system.git
-cd wally-daq-system
+# Test simulación completa
+python simulation/testing/test_simulation.py
+
+# Monitor datos en tiempo real
+python simulation/testing/monitor_simulation.py
+
+# Diagnóstico del sistema
+python simulation/testing/diagnose_system.py
 ```
 
-### 2. Setup Multiplataforma
-
-#### 🐧 Linux/macOS:
+### **📊 Comandos Arduino Verificados**
 ```bash
-# Setup automático
-./scripts/setup_environment.sh
-
-# O manual:
-python3 -m venv wally_env
-source wally_env/bin/activate
-pip install -r requirements.txt
-```
-
-#### 🪟 Windows:
-```cmd
-REM Setup automático
-scripts\setup_environment.bat
-
-REM O manual:
-python -m venv wally_env
-wally_env\Scripts\activate
-pip install -r requirements.txt
-```
-
-### 3. Configurar ESP32
-
-#### Editar configuración WiFi:
-```python
-# Archivo: esp32/config.py
-WIFI_SSID = "TU_WIFI_AQUI"          # ← CAMBIAR
-WIFI_PASSWORD = "TU_PASSWORD_AQUI"  # ← CAMBIAR
-```
-
-#### Flashear ESP32:
-
-🐧 **Linux/macOS:**
-```bash
-# Script automático
-./scripts/install_esp32.sh /dev/ttyUSB0
-
-# Manual
-esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
-esptool.py --chip esp32 --port /dev/ttyUSB0 write_flash -z 0x1000 esp32-20230426-v1.20.0.bin
-ampy --port /dev/ttyUSB0 put esp32/main.py
-ampy --port /dev/ttyUSB0 put esp32/config.py
-ampy --port /dev/ttyUSB0 put esp32/sensor_server.py
-ampy --port /dev/ttyUSB0 put esp32/boot.py
-```
-
-🪟 **Windows:**
-```cmd
-REM Script automático
-scripts\install_esp32.bat COM3
-
-REM Manual
-esptool.py --chip esp32 --port COM3 erase_flash
-esptool.py --chip esp32 --port COM3 write_flash -z 0x1000 esp32-20230426-v1.20.0.bin
-ampy --port COM3 put esp32/main.py
-ampy --port COM3 put esp32/config.py
-ampy --port COM3 put esp32/sensor_server.py
-ampy --port COM3 put esp32/boot.py
-```
-
-### 4. Ejecutar Sistema
-
-#### 🐧 Linux/macOS:
-```bash
-# Terminal 1: ESP32
-screen /dev/ttyUSB0 115200
-# En REPL: exec(open('main.py').read())
-
-# Terminal 2: Aplicación Python
-cd pc_controller
-python main.py
-```
-
-#### 🪟 Windows:
-```cmd
-REM Terminal 1: ESP32
-python -m serial.tools.miniterm COM3 115200
-REM En REPL: exec(open('main.py').read())
-
-REM Terminal 2: Aplicación Python
-cd pc_controller
-python main.py
-```
-
-## 🔧 Hardware Setup
-
-### **Conexiones ESP32 ↔ Vernier Shield**
-
-```
-Vernier Shield    →    ESP32 DevKit v1
-═══════════════════════════════════════
-ANALOG 1 (A0)     →    GPIO 34 (ADC1_CH6) - Temperatura
-ANALOG 2 (A1)     →    GPIO 35 (ADC1_CH7) - Fuerza  
-DIGITAL 1 (D2)    →    GPIO 4 (Pull-up)   - Fotopuerta
-DIGITAL 2 (D3)    →    GPIO 5 (Output)    - Trigger Ultrasonido
-Echo Ultrasonido  →    GPIO 18 (Input)    - Echo Ultrasonido
-LED Status (D13)  →    GPIO 2 (Built-in)  - LED Status
-VCC (5V)          →    VIN                - Alimentación
-GND               →    GND                - Tierra
-```
-
-### **Sensores Compatibles:**
-- **🌡️ Temperatura**: TMP36, Stainless Steel Temperature Probe
-- **⚡ Fuerza**: Dual-Range Force Sensor (±10N, ±50N)
-- **📷 Fotopuerta**: Photogate Head, Light Gate
-- **📐 Movimiento**: Motion Detector, HC-SR04 Ultrasonico
-
-## 📊 Nueva Interfaz vs Arduino
-
-### **Antes (Arduino Serial Monitor):**
-```
-Seleccione un sensor:
-t: Temperatura
-f: Fuerza  
-p: Fotopuerta
-m: Movimiento
-
-Temperature: 23.5
-Temperature: 23.7
-```
-
-### **Ahora (Tkinter Dashboard):**
-
-```
-🔬 Wally - Sistema de Adquisición de Datos        🟢 Adquisición activa
-═══════════════════════════════════════════════════════════════════
-
-📊 Sensores en Tiempo Real    │    📈 Gráficos en Tiempo Real
-                               │
-🌡️ Temperatura: 23.5°C ✅     │    [Gráfico temp en tiempo real]
-⚡ Fuerza: 12.3N ✅           │    [Gráfico fuerza en tiempo real]  
-📷 Fotopuerta: Abierta ✅     │    [Gráfico eventos fotopuerta]
-📐 Movimiento: 15.2cm ✅      │    [Gráfico distancia ultrasonido]
-
-🎛️ Controles Sistema
-[▶️ Iniciar] [⏹️ Detener] [📥 Exportar CSV]   📊 Lecturas: 1,234 | Duración: 02:15:30
-
-🔬 Control Sensores Vernier (Arduino Compatible)
-Cambiar Sensor: [🌡️ Temperatura] [⚡ Fuerza] [📷 Fotopuerta] [📐 Movimiento]
-Control Lecturas: [⏸️ Pausar] [▶️ Continuar]  Estado: Sensor: Temperatura ✅ Lecturas: Activas
+# Test compatibilidad Arduino 100%
+curl http://localhost:8080/vernier/command/t    # ✅ Temperatura
+curl http://localhost:8080/vernier/command/f    # ✅ Fuerza  
+curl http://localhost:8080/vernier/command/p    # ✅ Fotopuerta
+curl http://localhost:8080/vernier/command/m    # ✅ Movimiento
+curl http://localhost:8080/vernier/command/d    # ✅ Pausar
+curl http://localhost:8080/vernier/command/c    # ✅ Continuar
 ```
 
 ## 🌐 API REST Endpoints
@@ -334,147 +206,151 @@ GET /vernier/status             # Status específico Vernier
 GET /vernier/active             # Solo sensor activo actual
 ```
 
-### **Ejemplo Response JSON:**
-```json
-{
-  "device_id": "esp32_wally_vernier",
-  "timestamp": 1609459200.123,
-  "readings": {
-    "vernier_temperatura": {
-      "sensor_type": "temperatura",
-      "value": 23.7,
-      "unit": "°C",
-      "vernier_id": 1,
-      "source": "vernier"
-    },
-    "vernier_fuerza": {
-      "sensor_type": "fuerza", 
-      "value": 12.5,
-      "unit": "N",
-      "threshold": 100.0,
-      "led_status": false,
-      "vernier_id": 2,
-      "source": "vernier"
-    }
-  },
-  "vernier_active_sensor": 1,
-  "arduino_compatible": true
-}
+## 🔧 Hardware Setup
+
+### **Conexiones ESP32 ↔ Vernier Shield**
+
+```
+Vernier Shield    →    ESP32 DevKit v1    →    🎮 Simulación Wokwi
+═══════════════════════════════════════════════════════════════════
+ANALOG 1 (A0)     →    GPIO 34           →    Potenciómetro 1 (Verde)
+ANALOG 2 (A1)     →    GPIO 35           →    Potenciómetro 2 (Azul)  
+DIGITAL 1 (D2)    →    GPIO 4            →    Botón Azul (Fotopuerta)
+DIGITAL 2 (D3)    →    GPIO 5            →    Automático (Ultrasonido)
+LED Status (D13)  →    GPIO 2            →    LED Virtual (Rojo)
+VCC (5V)          →    VIN               →    Alimentación simulada
+GND               →    GND               →    Tierra simulada
 ```
 
-## 🧪 Testing y Validación
-
-### **Compatibilidad Arduino Verificada:**
-
-```bash
-# Test comandos originales via HTTP
-curl http://ESP32_IP:8080/vernier/command/t    # ✅ Temperatura
-curl http://ESP32_IP:8080/vernier/command/f    # ✅ Fuerza  
-curl http://ESP32_IP:8080/vernier/command/p    # ✅ Fotopuerta
-curl http://ESP32_IP:8080/vernier/command/m    # ✅ Movimiento
-curl http://ESP32_IP:8080/vernier/command/d    # ✅ Pausar
-curl http://ESP32_IP:8080/vernier/command/c    # ✅ Continuar
-```
-
-### **Benchmark Arduino vs ESP32:**
-
-| **Aspecto** | **Arduino Original** | **ESP32 Migrado** | **Mejora** |
-|-------------|---------------------|------------------|------------|
-| **Resolución ADC** | 10-bit (0-1023) | 12-bit (0-4095) | **4x mejor** |
-| **Velocidad CPU** | 16 MHz | 240 MHz | **15x más rápido** |
-| **Memoria RAM** | 2KB | 520KB | **260x más memoria** |
-| **Conectividad** | ❌ Solo Serial | ✅ WiFi + HTTP | **Inalámbrico** |
-| **Interfaz** | ❌ Monitor Serial | ✅ GUI Profesional | **Visual** |
-| **Storage** | ❌ Sin persistencia | ✅ CSV + Buffer | **Persistente** |
-| **Multi-sensor** | ❌ Uno a la vez | ✅ Todos simultáneos | **Paralelo** |
+### **Sensores Compatibles:**
+- **🌡️ Temperatura**: TMP36, Stainless Steel Temperature Probe
+- **⚡ Fuerza**: Dual-Range Force Sensor (±10N, ±50N)
+- **📷 Fotopuerta**: Photogate Head, Light Gate
+- **📐 Movimiento**: Motion Detector, HC-SR04 Ultrasonico
 
 ## 📋 Configuración
 
 ### **ESP32 (esp32/config.py):**
 ```python
-# WiFi - EDITAR OBLIGATORIO
+# WiFi - EDITAR OBLIGATORIO (Hardware real)
 WIFI_SSID = "TU_WIFI"
 WIFI_PASSWORD = "TU_PASSWORD" 
 
-# Pines Hardware (mapeo Arduino)
-SENSOR_PINS = {
-    'temperatura': 34,  # A0 → GPIO34
-    'fuerza': 35,      # A1 → GPIO35  
-    'fotopuerta': 4,   # D2 → GPIO4
-    'trigger': 5,      # D3 → GPIO5
-    'echo': 18,        # Nuevo para ultrasonido
-    'led': 2          # D13 → GPIO2
-}
-
-# Calibraciones Vernier
-SENSOR_CALIBRATION = {
-    'temperatura': {'slope': 100.0, 'offset': -50.0, 'unit': '°C'},
-    'fuerza': {'slope': 50.0, 'offset': -25.0, 'unit': 'N'},
-    'fotopuerta': {'slope': 1.0, 'offset': 0.0, 'unit': 'blocked'},
-    'movimiento': {'slope': 1.0, 'offset': 0.0, 'unit': 'cm'}
-}
+# Para simulación Wokwi usar:
+# WIFI_SSID = "Wokwi-GUEST"  
+# WIFI_PASSWORD = ""
 ```
 
 ### **PC (pc_controller/config.py):**
 ```python
-ESP32_IP = "192.168.1.100"  # ← IP del ESP32 (mostrada en consola)
-SAMPLE_INTERVAL = 1.0       # segundos entre lecturas
-MAX_BUFFER_SIZE = 1000      # entradas máximas en buffer
+# Hardware real
+ESP32_IP = "192.168.1.100"  # IP del ESP32 físico
+ESP32_PORT = 8080
+
+# Simulación Wokwi + Gateway
+ESP32_IP = "localhost"       # Usar con Wokwi IoT Gateway
+ESP32_PORT = 9080           # Puerto del gateway
+
+# Simulación Mock local
+ESP32_IP = "localhost"       # Emulador Python local
+ESP32_PORT = 8080           # Puerto directo
 ```
+
+## 🎯 Casos de Uso
+
+### **🎓 Educación:**
+- **Laboratorios remotos** - Estudiantes practican desde casa
+- **Migración Arduino→ESP32** - Ejemplo práctico completo  
+- **IoT y conectividad** - WiFi, HTTP, APIs REST
+- **🎮 Sin hardware requerido** - Simulación Wokwi
+
+### **👨‍💻 Desarrollo:**
+- **Prototipado rápido** - Testing sin esperar hardware
+- **CI/CD integration** - Testing automatizado en pipeline
+- **Desarrollo distribuido** - Equipos remotos sin hardware
+- **🧪 Validación completa** - Antes de implementación real
+
+### **🏢 Industria:**
+- **Proof of Concept** - Demos sin inversión hardware
+- **Training y certificación** - Personal sin equipos físicos
+- **Testing de integración** - Validar APIs y protocolos
+- **📊 Análisis de datos** - Simular años de datos en minutos
 
 ## 🛠️ Desarrollo y Testing
 
 ```bash
-# Desarrollo modo standalone
-cd pc_controller
-python main.py
+# 🎮 Desarrollo con simulación (recomendado)
+python simulation/mock_server/mock_esp32_server.py
+cd pc_controller && python main.py
 
-# Testing unitario
-python -m pytest tests/
+# 🧪 Testing unitario
+python simulation/testing/test_simulation.py
 
-# Scripts utilidad
-./scripts/setup_environment.sh     # Setup completo
-./scripts/install_esp32.sh         # Flash ESP32
+# 📊 Monitor tiempo real  
+python simulation/testing/monitor_simulation.py
 
-# Debugging ESP32
+# 🔧 Debugging ESP32 real
 screen /dev/ttyUSB0 115200          # Monitor serie
 curl http://ESP32_IP:8080/ping      # Test HTTP
+```
+
+## 🎓 **Getting Started por Perfil**
+
+### **👨‍🎓 Estudiantes - "Quiero aprender"**
+```
+🎯 Objetivo: Entender el sistema sin gastar dinero
+📖 Ruta: docs/simulation-guide.md → Wokwi setup → Cliente Python
+⏱️ Tiempo: 15 minutos
+💰 Costo: $0 (gratis)
+```
+
+### **👨‍💻 Desarrolladores - "Quiero implementar"**
+```  
+🎯 Objetivo: Adaptar para mi proyecto específico
+📖 Ruta: Simulación → Hardware real → Personalización
+⏱️ Tiempo: 1-2 horas setup + desarrollo
+💰 Costo: ~$20 ESP32 + sensores
+```
+
+### **🏢 Empresas - "Quiero evaluar"**
+```
+🎯 Objetivo: Validar para uso industrial
+📖 Ruta: Simulación → POC → Piloto → Producción  
+⏱️ Tiempo: 1 semana evaluación
+💰 Costo: Consultoría disponible
 ```
 
 ## 🤝 Contribuir
 
 1. Fork del repositorio
 2. Crear branch: `git checkout -b feature/nueva-funcionalidad`
-3. Commit: `git commit -m 'Agregar nueva funcionalidad'`
-4. Push: `git push origin feature/nueva-funcionalidad`
-5. Pull Request
+3. **Probar en simulación**: Usar Wokwi o Mock antes de hardware
+4. Commit: `git commit -m 'Agregar nueva funcionalidad'`
+5. Push: `git push origin feature/nueva-funcionalidad`  
+6. Pull Request
+
+### **🧪 Testing requerido para PRs:**
+```bash
+# Validar que simulación funciona
+python simulation/testing/test_simulation.py
+
+# Verificar compatibilidad Arduino
+curl tests para todos los comandos t,f,p,m,d,c
+
+# Test cliente Python conecta OK
+cd pc_controller && python main.py
+```
 
 ## 📄 Licencia
 
 MIT License - ver [LICENSE](LICENSE) para detalles
-
-## 🎯 Casos de Uso
-
-### **Educación:**
-- **Laboratorios de física** - Experimentos con múltiples sensores
-- **Cursos de ingeniería** - Ejemplo de migración hardware/software
-- **Proyectos estudiantiles** - Sistema DAQ completo funcional
-
-### **Investigación:**
-- **Adquisición de datos continua** - 24/7 sin intervención
-- **Experimentos remotos** - Control via WiFi
-- **Análisis en tiempo real** - Gráficos y tendencias inmediatas
-
-### **Industria:**
-- **Prototipos IoT** - Base para sistemas de monitoreo
-- **Control de calidad** - Mediciones automatizadas
-- **Mantenimiento predictivo** - Sensores en equipos críticos
 
 ## 💼 Servicios de Consultoría
 
 ### **Ingeniero Gino Viloria - Especialista en Sistemas DAQ**
 
 **🔧 Servicios Disponibles:**
+- ✅ **🎮 Setup simulación personalizada** - Wokwi/Mock para casos específicos
 - ✅ **Migración Arduino → ESP32** - Sistemas legacy a IoT moderno
 - ✅ **Implementación personalizada** de sistemas de adquisición de datos
 - ✅ **Integración de sensores** específicos y calibración avanzada
@@ -488,24 +364,31 @@ MIT License - ver [LICENSE](LICENSE) para detalles
 - 🔗 **LinkedIn:** [linkedin.com/in/gino-viloria](https://linkedin.com/in/gino-viloria)
 - 💻 **GitHub:** [github.com/codeviloria](https://github.com/codeviloria)
 
-**🎓 Especialización:**
-- **Sistemas IoT** y automatización industrial
-- **Adquisición de datos** en tiempo real
-- **Python/MicroPython** para sistemas embebidos
-- **Arquitecturas híbridas** ESP32 + PC
-- **Sensores científicos** e industriales
-- **Migración legacy** Arduino/PIC a ESP32
+---
 
-**💡 Proyectos Similares:**
-- Sistemas DAQ para universidades
-- Monitoreo ambiental IoT  
-- Control industrial con ESP32
-- Interfaces HMI personalizadas
-- Integración sensores Vernier/Pasco
+## 🏆 **¿Por qué Wally DAQ System?**
+
+### **Antes vs Ahora:**
+
+| **Aspecto** | **Arduino Tradicional** | **🔬 Wally DAQ + Simulación** |
+|-------------|-------------------------|-------------------------------|
+| **Setup Time** | 2-3 horas (hardware) | **5 minutos (simulación)** |
+| **Costo inicial** | $100+ ESP32+sensores | **$0 (Wokwi gratis)** |
+| **Debugging** | ❌ Serial Monitor básico | **✅ Dashboard profesional + logs** |
+| **Conectividad** | ❌ Solo cable serie | **✅ WiFi + HTTP + APIs** |
+| **Colaboración** | ❌ Hardware físico requerido | **✅ Compartir link simulación** |
+| **Enseñanza** | ❌ Requiere laboratorio | **✅ Estudiantes desde casa** |
+| **Escalabilidad** | ❌ Un ESP32 = un estudiante | **✅ Infinitos usuarios simultáneos** |
+| **Testing** | ❌ Manual y lento | **✅ Automatizado con scripts** |
+
+### **🎯 Resultado:**
+**Mismo aprendizaje y funcionalidad, pero más rápido, barato y escalable.**
 
 ---
 
-**🏆 Proyecto Destacado:** Migración completa Arduino → ESP32 manteniendo 100% compatibilidad de comandos mientras se agrega conectividad WiFi, interfaz gráfica profesional y capacidades IoT modernas.
+**🚀 ¡Comienza ahora con simulación en 5 minutos!** → [docs/simulation-guide.md](docs/simulation-guide.md)
+
+**🏆 Proyecto Destacado:** Migración completa Arduino → ESP32 manteniendo 100% compatibilidad de comandos mientras se agrega conectividad WiFi, interfaz gráfica profesional, capacidades IoT modernas **y simulación completa sin hardware**.
 
 **Desarrollado para proyectos académicos y aplicaciones industriales**  
 **© 2025 Ingeniero Gino Viloria - Consultoría en Sistemas DAQ**

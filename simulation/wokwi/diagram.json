@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "author": "Wally DAQ Simulation",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_temp",
+      "top": 100,
+      "left": 300,
+      "attrs": {"label": "Temperature Sensor"}
+    },
+    {
+      "type": "wokwi-potentiometer", 
+      "id": "pot_force",
+      "top": 200,
+      "left": 300,
+      "attrs": {"label": "Force Sensor"}
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_photogate",
+      "top": 300,
+      "left": 300,
+      "attrs": {"label": "Photogate", "color": "blue"}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_status",
+      "top": 400,
+      "left": 300,
+      "attrs": {"color": "red", "label": "Status LED"}
+    }
+  ],
+  "connections": [
+    ["esp:GPIO34", "pot_temp:SIG", "green", []],
+    ["esp:GPIO35", "pot_force:SIG", "blue", []],
+    ["esp:GPIO4", "btn_photogate:1.l", "yellow", []],
+    ["esp:GPIO2", "led_status:A", "red", []],
+    ["esp:3V3", "pot_temp:VCC", "red", []],
+    ["esp:3V3", "pot_force:VCC", "red", []],
+    ["esp:GND", "pot_temp:GND", "black", []],
+    ["esp:GND", "pot_force:GND", "black", []],
+    ["esp:GND", "btn_photogate:2.l", "black", []],
+    ["esp:GND", "led_status:C", "black", []]
+  ],
+  "dependencies": {}
+}
